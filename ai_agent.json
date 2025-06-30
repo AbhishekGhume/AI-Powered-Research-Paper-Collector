@@ -1,0 +1,693 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Use Input",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "project description",
+              "placeholder": "Enter your project description",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "number of research papers",
+              "fieldType": "number",
+              "placeholder": "Enter how many research papers you want",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "user email",
+              "fieldType": "email",
+              "placeholder": "Enter your email to send the final file to your email",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Your response has been recorded. You will receive a sheet at your provided email containing research papers related to your project description within a minute."
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -960,
+        60
+      ],
+      "id": "006aebe3-0c9f-4bd0-93d9-a4e8496e99a1",
+      "name": "Form",
+      "webhookId": "07bb3ccb-a54b-47b0-a5b5-f60fb0575c9e",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -520,
+        60
+      ],
+      "id": "6073a1ce-18ad-44b2-a57c-9114be960870",
+      "name": "Create spreadsheet",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOQ4wWt5D2zd3FOJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.spreadsheetId }}/permissions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Content-Type\":  \"application/json\"\n}\n",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"role\": \"reader\",\n  \"type\": \"anyone\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -280,
+        60
+      ],
+      "id": "5f3f6b70-b5ba-4e36-ad3e-b60c8eb850f9",
+      "name": "Make Sheet Public (view)",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOQ4wWt5D2zd3FOJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6796039b-daeb-45a6-8982-c643468f1611",
+              "name": "columns",
+              "value": "Title, Authors, Abstract, Year, URL, IEEE Reference",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -60,
+        60
+      ],
+      "id": "7f4d1d30-ac6b-48a7-b13e-e8ed472082c1",
+      "name": "Define headers for sheet",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const headerArray = $input.first().json.columns.split(',');\n\nconst headerObject = {};\nheaderArray.forEach(header => {\n  const trimmedHeader = header.trim();\n  headerObject[trimmedHeader] = trimmedHeader;\n});\n\nreturn [\n  {\n    json: headerObject\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        60
+      ],
+      "id": "9445c8c4-26bf-4339-bba6-3042be988012",
+      "name": "Create Sheet Headers"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16JKXnWevFKiL47mOC8O06orTR0y8Kn4tN0EAzRi6-K4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Authors",
+              "displayName": "Authors",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Abstract",
+              "displayName": "Abstract",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Year",
+              "displayName": "Year",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "IEEE Reference",
+              "displayName": "IEEE Reference",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        400,
+        60
+      ],
+      "id": "8985bd7f-91ad-4c44-8ca1-8e2c4c755a3b",
+      "name": "Add header to sheet",
+      "alwaysOutputData": false,
+      "retryOnFail": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOQ4wWt5D2zd3FOJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16JKXnWevFKiL47mOC8O06orTR0y8Kn4tN0EAzRi6-K4/edit#gid=0"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        620,
+        60
+      ],
+      "id": "e9cedd40-2e88-4631-865c-60ff3bcc94dc",
+      "name": "Delete duplicate header row from sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOQ4wWt5D2zd3FOJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.semanticscholar.org/graph/v1/paper/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $('Form').item.json['project description'] }}"
+            },
+            {
+              "name": "limit",
+              "value": "={{ $('Form').item.json['number of research papers'] }}"
+            },
+            {
+              "name": "fields",
+              "value": "title,authors,abstract,year,url"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Key",
+              "value": "Accept"
+            },
+            {
+              "name": "Value",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        60
+      ],
+      "id": "2299260d-9646-479f-a218-346e191556a1",
+      "name": "Fetch Research Papers (Semantic Scholar)",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        60
+      ],
+      "id": "be9d15b3-c665-4c44-94a2-92acd9dcde23",
+      "name": "Split Research Papers"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bf1a9a6f-b215-4b04-a09d-3f053423d9ef",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "fb91e515-2b12-4574-ae5c-c5678f9d7e42",
+              "name": "authors",
+              "value": "={{ $json.authors.map(author => author.name).join(', ') }}\n",
+              "type": "string"
+            },
+            {
+              "id": "33b7c137-fde0-45b3-9704-c3a35daa88ec",
+              "name": "abstract",
+              "value": "={{ $json.abstract }}",
+              "type": "string"
+            },
+            {
+              "id": "5fd34ff5-2c51-4b76-83a3-654bfe376baa",
+              "name": "year",
+              "value": "={{ $json.year }}",
+              "type": "string"
+            },
+            {
+              "id": "fd6638ab-a525-435c-8742-41c038f98f5a",
+              "name": "url",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "f40ee6b9-554f-4ae2-95aa-ffbbcddfd9fa",
+              "name": "IEEE Reference",
+              "value": "={{ \n  $json.authors.length <= 6 \n    ? $json.authors.map(a => a.name).join(', ') \n    : $json.authors[0].name + ' et al.' \n}}, \"{{ $json.title }}\", {{ $json.year }}. [Online]. Available: {{ $json.url }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1260,
+        60
+      ],
+      "id": "58eb2e22-ed6d-42d6-a69e-3ce2d811715a",
+      "name": "Format Paper Data for Sheet"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16JKXnWevFKiL47mOC8O06orTR0y8Kn4tN0EAzRi6-K4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Title": "={{ $('Format Paper Data for Sheet').item.json.title }}",
+            "Authors": "={{ $('Format Paper Data for Sheet').item.json.authors }}",
+            "Abstract": "={{ $('Format Paper Data for Sheet').item.json.abstract }}",
+            "Year": "={{ $('Format Paper Data for Sheet').item.json.year }}",
+            "URL": "={{ $('Format Paper Data for Sheet').item.json.url }}",
+            "IEEE Reference": "={{ $('Format Paper Data for Sheet').item.json['IEEE Reference'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Authors",
+              "displayName": "Authors",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Abstract",
+              "displayName": "Abstract",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Year",
+              "displayName": "Year",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IEEE Reference",
+              "displayName": "IEEE Reference",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1480,
+        60
+      ],
+      "id": "264b77cb-526c-4371-98bb-69c6e048996a",
+      "name": "Append data sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOQ4wWt5D2zd3FOJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Form').item.json['user email'] }}",
+        "subject": "AI Agent: Research Papers Collected for Your Topic",
+        "emailType": "text",
+        "message": "=Hi, here is the Google Sheet with the research papers you requested:\n\n{{ $('Create spreadsheet').item.json.spreadsheetUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1700,
+        60
+      ],
+      "id": "82892b83-caea-49af-b17d-66ab418a7a44",
+      "name": "Send a mail with sheet link",
+      "webhookId": "cb34985c-94b2-4da6-80bd-e2ef2b94e48f",
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8NPg6lZjLHaILJDF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI agent that helps generate clean, relevant file names for research summary sheets. Based on the following project description, generate a short and informative file name suitable for a Google Sheet title. Avoid special characters and keep it under 10 words. Make sure it's relevant and clear.\n\nProject Description: \"{{ $json['project description'] }}\"",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -820,
+        320
+      ],
+      "id": "eb53363c-53df-4018-b10e-6102a82b7ba9",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        80
+      ],
+      "id": "471a28a1-6414-4846-948c-cdedb28fb691",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EOObql81lW7vOr6Q",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Form": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Make Sheet Public (view)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Make Sheet Public (view)": {
+      "main": [
+        [
+          {
+            "node": "Define headers for sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define headers for sheet": {
+      "main": [
+        [
+          {
+            "node": "Create Sheet Headers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Sheet Headers": {
+      "main": [
+        [
+          {
+            "node": "Add header to sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add header to sheet": {
+      "main": [
+        [
+          {
+            "node": "Delete duplicate header row from sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete duplicate header row from sheet": {
+      "main": [
+        [
+          {
+            "node": "Fetch Research Papers (Semantic Scholar)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Research Papers (Semantic Scholar)": {
+      "main": [
+        [
+          {
+            "node": "Split Research Papers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Research Papers": {
+      "main": [
+        [
+          {
+            "node": "Format Paper Data for Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Paper Data for Sheet": {
+      "main": [
+        [
+          {
+            "node": "Append data sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append data sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a mail with sheet link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Create spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "85d33af137e699f199b1914743d0e52fcce3a823e1bfa42b1b705f0822ca6251"
+  }
+}
