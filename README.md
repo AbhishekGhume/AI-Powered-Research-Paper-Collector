@@ -40,7 +40,7 @@ An automated n8n workflow that collects research papers based on user input, for
 ```
 project-root/
 ├── README.md        # You're reading it
-├── research-flow.json  # Exported n8n workflow file
+├── ai_agent.json  # Exported n8n workflow file
 ```
 
 ---
