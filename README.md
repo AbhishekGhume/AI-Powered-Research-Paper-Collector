@@ -15,10 +15,10 @@ An automated n8n workflow that collects research papers based on user input, for
 * 🧠 Uses **Google Gemini LLM** to:
 
   * Generate a smart spreadsheet title
-  * Summarize abstracts (optional future extension)
+  * Summarize abstracts
 * 📊 Creates and formats a **Google Sheet**
 
-  * Adds headers: Title, Authors, Abstract, Year, URL, IEEE Reference
+  * Adds headers: Title, Authors, Summery, Year, URL, IEEE Reference
   * Appends all paper data, formatted with proper citation
 * 🔗 Makes the sheet publicly accessible
 * 📧 Sends an email with the link to the generated sheet
@@ -80,9 +80,9 @@ The system will:
 
 ## ✅ Output Example
 
-| Title              | Authors                       | Abstract | Year | URL  | IEEE Reference                                                           |
-| ------------------ | ----------------------------- | -------- | ---- | ---- | ------------------------------------------------------------------------ |
-| IoT in Agriculture | H. Gamido, M. Gamido, A. Siso | ...      | 2024 | link | H. Gamido et al., "IoT in Agriculture", 2024. \[Online]. Available: link |
+| Title              | Authors                       | Research Papar Summery | Year | URL  | IEEE Reference                                                           |
+| ------------------ | ----------------------------- | ---------------------- | ---- | ---- | ------------------------------------------------------------------------ |
+| IoT in Agriculture | H. Gamido, M. Gamido, A. Siso | ...................... | 2024 | link | H. Gamido et al., "IoT in Agriculture", 2024. \[Online]. Available: link |
 
 ---
 
