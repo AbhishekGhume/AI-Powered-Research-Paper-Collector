@@ -86,13 +86,6 @@ The system will:
 
 ---
 
-## 🧠 Future Improvements
-
-* Use Gemini to generate short abstracts
-* Integrate citation format switch (APA, MLA, IEEE)
-* Add user authentication for tracking requests
-
----
 
 ## 📬 Contact
 
