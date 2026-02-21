@@ -4,6 +4,11 @@ An automated n8n workflow that collects research papers based on user input, for
 
 ---
 
+## 🎥 Working Demo
+https://drive.google.com/file/d/1GHQg8oTy76OTHw88RXk_oJ1QTinQSMlm/view?usp=sharing
+
+---
+
 ## 🚀 Features
 
 * 📥 Collects user input via a public **Form Trigger**
